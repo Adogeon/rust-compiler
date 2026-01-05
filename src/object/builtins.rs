@@ -118,6 +118,14 @@ pub fn builtins_fn(input: &str) -> Object {
                 }
             },
         })),
+        "put" => Object::BUILTIN(Rc::new(Builtin {
+            function: |parameter| {
+                for arg in parameter {
+                    println!("{}", arg.inspect())
+                }
+                Object::NULL
+            },
+        })),
         _ => Object::NULL,
     }
 }
