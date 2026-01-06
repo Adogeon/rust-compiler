@@ -1,4 +1,4 @@
-use crate::ast::{Identifier, Statement};
+use crate::ast::{self, Identifier, Statement};
 use environment::Env;
 use hash::{HashKey, HashPair};
 use std::collections::HashMap;
@@ -58,6 +58,20 @@ impl PartialEq for HashObject {
     }
 }
 
+struct Quote {
+    pub node: dyn ast::Node,
+}
+
+impl PartialEq for Quote {
+    fn eq(&self, _other: &Self) -> bool {
+        false
+    }
+
+    fn ne(&self, _other: &Self) -> bool {
+        true
+    }
+}
+
 #[derive(PartialEq, Clone)]
 pub enum Object {
     INTEGER(i64),
@@ -69,6 +83,7 @@ pub enum Object {
     ERROR(String),
     ARRAY(Vec<Object>),
     HASH(Rc<HashObject>),
+    QUOTEOBJ(Rc<Quote>),
     NULL,
 }
 
@@ -114,6 +129,9 @@ impl Object {
                 write!(buffer, "[ {} ]", hash_list).expect("Can't inspect hash");
                 buffer
             }
+            Self::QUOTEOBJ(val) => {
+                format!("QUOTE({})", val.node.to_string())
+            }
             Self::NULL => String::from("null"),
         }
     }
@@ -129,6 +147,7 @@ impl Object {
             Self::BUILTIN(_) => "BUILTIN_FN",
             Self::ARRAY(_) => "ARRAY",
             Self::HASH(_) => "HASH_OBJECT",
+            Self::QUOTEOBJ(_) => "QUOTE_OBJECT",
             Self::NULL => "NULL",
         }
     }
