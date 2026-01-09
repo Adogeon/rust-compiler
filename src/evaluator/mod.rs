@@ -1,8 +1,8 @@
-use crate::ast::{BlockStatement, Expression, HashLiteral, Program, Statement};
+use crate::ast::{BlockStatement, Expression, HashLiteral, Node, Program, Statement};
 use crate::object::builtins::builtins_fn;
 use crate::object::environment::{Env, Environment};
 use crate::object::hash::{HashKey, HashPair};
-use crate::object::{new_error, Function, HashObject, Object};
+use crate::object::{new_error, Function, HashObject, Object, Quote};
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -100,6 +100,15 @@ impl Evaluable for Expression {
                 }))
             }
             Expression::CallExp(call_expression) => {
+                match call_expression.function.token_literal() {
+                    Some(tok) => {
+                        if tok == "quote" {
+                            return quote(call_expression.arguments[0].clone());
+                        }
+                    }
+                    None => return new_error("function token is null".to_string()),
+                }
+
                 let function = call_expression.function.eval(env.clone());
                 if is_error(&function) {
                     return function;
@@ -367,6 +376,10 @@ fn eval_bang_operator_expression(right: Object) -> Object {
         NULL => TRUE,
         _ => FALSE,
     }
+}
+
+fn quote(args: Expression) -> Object {
+    Object::QUOTE(Rc::new(Quote { node: args.clone() }))
 }
 
 impl Evaluable for Statement {
