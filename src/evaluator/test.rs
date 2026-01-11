@@ -496,3 +496,27 @@ fn test_quotes() -> Result<(), String> {
 
     Ok(())
 }
+
+#[test]
+fn test_unquotes() -> Result<(), String> {
+    let test_cases = vec![
+        ("quote(unquote(4))", "4"),
+        ("quote(unquote(4 + 4))", "8"),
+        ("quote(8 + unquote(4))", "(8 + 8)"),
+        ("quote(unquote(4 + 4) + 8)", "(8 + 8)"),
+    ];
+
+    for (input, expect) in test_cases {
+        let evaluated = test_eval(input)?;
+        let eval = test_eval(input)?;
+        if let Object::QUOTE(v) = evaluated {
+            match v.node.token_literal() {
+                Some(_) => assert_eq!(v.node.to_string(), expect),
+                None => return Err("quote.Node is null".to_string()),
+            }
+        } else {
+            return Err(format!("expect Object::NODE. got {}", eval.ob_type()));
+        }
+    }
+    Ok(())
+}
