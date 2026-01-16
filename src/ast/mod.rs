@@ -2,6 +2,8 @@ use crate::token::Token;
 use std::fmt::Display;
 use std::rc::Rc;
 
+pub mod modify;
+
 pub trait Node: Display {
     fn token_literal(&self) -> Option<&str>;
 }
