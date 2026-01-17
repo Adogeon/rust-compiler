@@ -11,10 +11,12 @@ A Rust implementation of the **Monkey programming language** interpreter from Th
 - **AST Representation**: Full representation of the Monkey language syntax.
 - **Evaluator**: Walks the AST and executes the program.
 - **REPL**: Interactive Read-Eval-Print Loop
+- **Built-in Functions**: Implementing core language built-ins
+- **Array and Hash Support**: Implement collections object via Rust Vector and HashMap crate
 
 ### In Progress
 
-- **Built-in Functions**: Implementing core language built-ins
+- **The Lost Chapter Macro**: Allow user to build macro in Monkey
 
 ## Building and Running
 
