@@ -426,4 +426,4 @@ pub fn eval<T: Evaluable>(node: &T, env: Env) -> Object {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

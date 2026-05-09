@@ -6,7 +6,7 @@ fn test_make() -> Result<(), String> {
         vec![(OP_CONSTANT, &[65534], vec![OP_CONSTANT, 255, 254])];
 
     for (op, operands, expected) in test_cases {
-        let instruction: Vec<u8> = make(op, operands);
+        let instruction: Instruction = Instruction::make(op, operands);
 
         if instruction.len() != expected.len() {
             return Err(format!(
@@ -17,14 +17,70 @@ fn test_make() -> Result<(), String> {
         }
 
         for (i, b) in expected.iter().enumerate() {
-            if instruction[i] != expected[i] {
+            if instruction.bit_as_slices()[i] != expected[i] {
                 return Err(format!(
                     "wrong byte at position {}, want {}, got {}",
-                    i, b, instruction[i]
+                    i,
+                    b,
+                    instruction.bit_as_slices()[i]
                 ));
             }
         }
     }
 
+    Ok(())
+}
+
+#[test]
+fn test_instructions_string() -> Result<(), String> {
+    let instructions = vec![
+        make(OP_CONSTANT, &[1]),
+        make(OP_CONSTANT, &[2]),
+        make(OP_CONSTANT, &[65535]),
+    ];
+
+    let expected = "
+        000 OpConstant 1
+        003 OpConstant 2
+        006 OpConstant 65535
+    ";
+
+    let concatted = Instruction(instructions.concat());
+    assert_eq!(
+        Instruction::string(&concatted),
+        expected,
+        "instructions wrongly formatted. want = {}, got = {}",
+        expected,
+        Instruction::string(&concatted)
+    );
+
+    Ok(())
+}
+
+#[test]
+fn test_read_operands() -> Result<(), String> {
+    let test_cases: Vec<(Opcode, &[u16], u16)> = vec![(OP_CONSTANT, &[65535], 2)];
+
+    for tc in test_cases {
+        let instruction = Instruction::make(tc.0, tc.1);
+
+        if let Some(def) = look_up(tc.0) {
+            println!("{:?}", def);
+            println!("{:?}", instruction);
+            let (operand_read, n) = instruction.read_operands(def);
+            println!("{:?}", operand_read);
+            println!("{:?}", n);
+            assert_eq!(n, tc.2, "n wrong. want={}, got={}", tc.2, n);
+            for (i, want) in tc.1.iter().enumerate() {
+                assert_eq!(
+                    operand_read[i], *want,
+                    "operand wrong. want={}, got={}",
+                    want, operand_read[i]
+                )
+            }
+        } else {
+            return Err(format!("definition not found"));
+        }
+    }
     Ok(())
 }

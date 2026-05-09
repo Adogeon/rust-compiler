@@ -1,14 +1,13 @@
 use super::ast;
-use super::code;
 use super::object;
 
 struct Bytecode {
-    instruction: code::Instructions,
+    instruction: Vec<u8>,
     constants: Vec<object::Object>,
 }
 
 struct Compiler {
-    instructions: code::Instructions,
+    instructions: Vec<u8>,
     constants: Vec<object::Object>,
 }
 
@@ -21,7 +20,7 @@ impl Compiler {
     }
 
     fn compile(&self, node: impl ast::Node) -> Result<(), String> {
-        return Err(format!("can't compile"));
+        Ok(())
     }
 
     fn bytecode(&self) -> Bytecode {
