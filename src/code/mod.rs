@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::fmt::{Display, Write};
 
 type Opcode = u8;
 
@@ -29,8 +29,8 @@ impl Instruction {
         }
     }
 
-    fn bits(self) -> Vec<u8> {
-        self.0
+    fn bits(&self) -> &Vec<u8> {
+        &self.0
     }
 
     fn bit_as_slices(&self) -> &[u8] {
@@ -41,15 +41,15 @@ impl Instruction {
         self.0.len()
     }
 
-    fn read_operands(&self, def: Definition) -> (Vec<u16>, u16) {
+    fn read_operands(def: &Definition, instruction: &[u8]) -> (Vec<u16>, u16) {
         let mut operands: Vec<u16> = Vec::new();
-        let mut offset: usize = 1;
+        let mut offset: usize = 0;
 
         for width in def.1.iter() {
             match width {
                 2 => {
                     let end = offset + *width as usize;
-                    let inst_slice = &self.bit_as_slices()[offset..end];
+                    let inst_slice = &instruction[offset..end];
                     operands.push(u16::from_be_bytes(
                         inst_slice.try_into().expect("Error reading operand"),
                     ));
@@ -58,12 +58,48 @@ impl Instruction {
                 _ => (),
             }
         }
-        let len = offset - 1;
-        (operands, len as u16)
+        (operands, offset as u16)
     }
 
     fn string(inst: &Self) -> String {
-        todo!()
+        let mut buffer = String::new();
+        let mut step = 0;
+        let inst_slice = inst.bit_as_slices();
+        println!("{:?}", inst_slice);
+        println!("{}", inst_slice.len());
+        while step < inst_slice.len() {
+            if let Some(def) = look_up(inst_slice[step]) {
+                let (operands, read) = Instruction::read_operands(&def, &inst_slice[step + 1..]);
+                writeln!(
+                    buffer,
+                    "{:03} {}",
+                    step,
+                    Instruction::fmt_instruction(&def, &operands)
+                )
+                .unwrap();
+                step = step + 1 + read as usize;
+            } else {
+                buffer.push_str(&String::from("Error: can't find instruciton definition"));
+                continue;
+            }
+        }
+        buffer
+    }
+
+    fn fmt_instruction(def: &Definition, operands: &[u16]) -> String {
+        let operand_count = def.1.len();
+        if operands.len() != operand_count {
+            return format!(
+                "Error: operand len {} does not match defined {}\n",
+                operands.len(),
+                operand_count
+            );
+        };
+
+        match operand_count {
+            1 => format!("{} {}", def.0, operands[0]),
+            _ => format!("Error: unhandle operand_count for {}", def.0),
+        }
     }
 }
 

@@ -39,11 +39,7 @@ fn test_instructions_string() -> Result<(), String> {
         make(OP_CONSTANT, &[65535]),
     ];
 
-    let expected = "
-        000 OpConstant 1
-        003 OpConstant 2
-        006 OpConstant 65535
-    ";
+    let expected = "000 OpConstant 1\n003 OpConstant 2\n006 OpConstant 65535\n";
 
     let concatted = Instruction(instructions.concat());
     assert_eq!(
@@ -65,11 +61,7 @@ fn test_read_operands() -> Result<(), String> {
         let instruction = Instruction::make(tc.0, tc.1);
 
         if let Some(def) = look_up(tc.0) {
-            println!("{:?}", def);
-            println!("{:?}", instruction);
-            let (operand_read, n) = instruction.read_operands(def);
-            println!("{:?}", operand_read);
-            println!("{:?}", n);
+            let (operand_read, n) = Instruction::read_operands(&def, &instruction.0[1..]);
             assert_eq!(n, tc.2, "n wrong. want={}, got={}", tc.2, n);
             for (i, want) in tc.1.iter().enumerate() {
                 assert_eq!(
