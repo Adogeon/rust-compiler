@@ -1,11 +1,17 @@
 use super::*;
 use crate::evaluator::test::test_integer_object;
-use crate::{ast::Program, code, lexer::Lexer, object::Object, parser::Parser};
+use crate::{
+    ast::Program,
+    code::{Instruction, OP_CONSTANT},
+    lexer::Lexer,
+    object::Object,
+    parser::Parser,
+};
 
 struct CompilerTestCase {
     input: &'static str,
     expected_constants: Vec<Object>,
-    expected_instructions: Vec<Vec<u8>>,
+    expected_instructions: Vec<Instruction>,
 }
 
 #[test]
@@ -14,8 +20,8 @@ fn test_integer_arithmetic() -> Result<(), String> {
         input: "1+2",
         expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
         expected_instructions: vec![
-            code::make(code::OP_CONSTANT, &[0 as u16]),
-            code::make(code::OP_CONSTANT, &[1 as u16]),
+            Instruction::make(OP_CONSTANT, &[0 as u16]),
+            Instruction::make(OP_CONSTANT, &[1 as u16]),
         ],
     }];
 
@@ -61,31 +67,26 @@ fn test_constants(expected_constants: Vec<Object>, constants: Vec<Object>) -> Re
 }
 
 fn test_instructions(
-    expected_instructions: Vec<Vec<u8>>,
-    instruction: Vec<u8>,
+    expected_instructions: Vec<Instruction>,
+    instruction: Instruction,
 ) -> Result<(), String> {
-    let concatted = expected_instructions.concat();
+    let concatted = Instruction::concat_inst(expected_instructions);
     assert_eq!(
         concatted.len(),
-        instruction.len(),
+        instruction.slices().len(),
         "wrong instruction length; expect {}, got {}",
-        concatted
-            .iter()
-            .map(|v| v.to_string())
-            .collect::<Vec<String>>()
-            .join(","),
-        instruction
-            .iter()
-            .map(|v| v.to_string())
-            .collect::<Vec<String>>()
-            .join(",")
+        Instruction::string(&concatted),
+        Instruction::string(&instruction)
     );
 
-    for (i, ins) in concatted.iter().enumerate() {
+    for (i, ins) in concatted.slices().iter().enumerate() {
         assert_eq!(
-            instruction[i], *ins,
+            instruction.slices()[i],
+            *ins,
             "wrong instruction at {}; expect {}, got {}",
-            i, ins, instruction[i]
+            i,
+            ins,
+            instruction.slices()[i]
         )
     }
 

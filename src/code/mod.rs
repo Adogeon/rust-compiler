@@ -1,5 +1,4 @@
 use std::fmt::{Display, Write};
-
 type Opcode = u8;
 
 pub const OP_CONSTANT: Opcode = 0b0;
@@ -13,11 +12,11 @@ fn look_up(op_code: Opcode) -> Option<Definition> {
     }
 }
 
-#[derive(Debug)]
-struct Instruction(Vec<u8>);
+#[derive(Debug, Clone)]
+pub struct Instruction(Vec<u8>);
 
 impl Instruction {
-    fn make(op_code: Opcode, operands: &[u16]) -> Self {
+    pub fn make(op_code: Opcode, operands: &[u16]) -> Self {
         match op_code {
             OP_CONSTANT => {
                 let mut result = vec![op_code];
@@ -29,19 +28,31 @@ impl Instruction {
         }
     }
 
-    fn bits(&self) -> &Vec<u8> {
+    pub fn from_bits(bits: Vec<u8>) -> Self {
+        Instruction(bits)
+    }
+
+    pub fn concat_inst(ins: Vec<Instruction>) -> Instruction {
+        let mut buffer: Vec<u8> = Vec::new();
+        for instruction in ins {
+            buffer = [buffer, instruction.0].concat();
+        }
+        Instruction(buffer)
+    }
+
+    pub fn bits(&self) -> &Vec<u8> {
         &self.0
     }
 
-    fn bit_as_slices(&self) -> &[u8] {
+    pub fn slices(&self) -> &[u8] {
         self.0.as_slice()
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.0.len()
     }
 
-    fn read_operands(def: &Definition, instruction: &[u8]) -> (Vec<u16>, u16) {
+    pub fn read_operands(def: &Definition, instruction: &[u8]) -> (Vec<u16>, u16) {
         let mut operands: Vec<u16> = Vec::new();
         let mut offset: usize = 0;
 
@@ -61,10 +72,10 @@ impl Instruction {
         (operands, offset as u16)
     }
 
-    fn string(inst: &Self) -> String {
+    pub fn string(inst: &Self) -> String {
         let mut buffer = String::new();
         let mut step = 0;
-        let inst_slice = inst.bit_as_slices();
+        let inst_slice = inst.slices();
         println!("{:?}", inst_slice);
         println!("{}", inst_slice.len());
         while step < inst_slice.len() {
@@ -78,6 +89,7 @@ impl Instruction {
                 )
                 .unwrap();
                 step = step + 1 + read as usize;
+                println!("{}", step);
             } else {
                 buffer.push_str(&String::from("Error: can't find instruciton definition"));
                 continue;

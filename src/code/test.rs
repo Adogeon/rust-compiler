@@ -17,12 +17,12 @@ fn test_make() -> Result<(), String> {
         }
 
         for (i, b) in expected.iter().enumerate() {
-            if instruction.bit_as_slices()[i] != expected[i] {
+            if instruction.slices()[i] != expected[i] {
                 return Err(format!(
                     "wrong byte at position {}, want {}, got {}",
                     i,
                     b,
-                    instruction.bit_as_slices()[i]
+                    instruction.slices()[i]
                 ));
             }
         }

@@ -1,13 +1,14 @@
 use super::ast;
+use super::code::Instruction;
 use super::object;
 
 struct Bytecode {
-    instruction: Vec<u8>,
+    instruction: Instruction,
     constants: Vec<object::Object>,
 }
 
 struct Compiler {
-    instructions: Vec<u8>,
+    instructions: Vec<Instruction>,
     constants: Vec<object::Object>,
 }
 
@@ -25,7 +26,7 @@ impl Compiler {
 
     fn bytecode(&self) -> Bytecode {
         Bytecode {
-            instruction: self.instructions.clone(),
+            instruction: Instruction::from_bits(Vec::new()),
             constants: self.constants.clone(),
         }
     }

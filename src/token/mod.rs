@@ -65,10 +65,17 @@ impl Token {
             tok_literal: literal.to_string(),
         }
     }
+
+    pub fn none() -> Token {
+        Token {
+            tok_type: TType::EOF,
+            tok_literal: String::from("NONE"),
+        }
+    }
 }
 
 impl Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "(Type:{:?}, Literal:{}", self.tok_type, self.tok_literal)
+        write!(f, "{}", self.tok_literal)
     }
 }
