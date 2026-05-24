@@ -9,7 +9,7 @@ pub enum NodeType {
 }
 
 pub trait IsNode: Display {
-    fn token(&self) -> Token;
+    fn token(&self) -> Option<&Token>;
     fn node_type() -> NodeType;
 }
 
@@ -18,11 +18,11 @@ pub struct Program {
 }
 
 impl IsNode for Program {
-    fn token(&self) -> Token {
+    fn token(&self) -> Option<&Token> {
         if self.statements.len() > 0 {
             self.statements[0].token()
         } else {
-            Token::none()
+            None
         }
     }
 
@@ -48,12 +48,12 @@ pub enum Statement {
 }
 
 impl IsNode for Statement {
-    fn token(&self) -> Token {
+    fn token(&self) -> Option<&Token> {
         match self {
-            Statement::LetStmt(let_statement) => let_statement.stmt_token,
-            Statement::RetStmt(return_statement) => return_statement.stmt_token,
-            Statement::ExpStmt(expression_statement) => expression_statement.stmt_token,
-            Statement::BlcStmt(block_statement) => block_statement.token,
+            Statement::LetStmt(let_statement) => Some(&let_statement.token),
+            Statement::RetStmt(return_statement) => Some(&return_statement.token),
+            Statement::ExpStmt(expression_statement) => Some(&expression_statement.token),
+            Statement::BlcStmt(block_statement) => Some(&block_statement.token),
         }
     }
 
@@ -64,19 +64,19 @@ impl IsNode for Statement {
 
 impl Display for Statement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.token().to_string())
+        write!(f, "{}", self.token().unwrap())
     }
 }
 
 pub struct LetStatement {
-    pub stmt_token: Token,
+    pub token: Token,
     pub name: Identifier,
     pub value: Expression,
 }
 
 impl Display for LetStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {} = ", self.token_literal().unwrap(), self.name)?;
+        write!(f, "{} {} = ", self.token, self.name)?;
         write!(f, "{}", self.value)?;
 
         write!(f, ";")
@@ -90,13 +90,13 @@ impl From<LetStatement> for Statement {
 }
 
 pub struct ReturnStatement {
-    pub stmt_token: Token,
+    pub token: Token,
     pub return_value: Box<Expression>,
 }
 
 impl Display for ReturnStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} ", self.token_literal().unwrap())?;
+        write!(f, "{} ", self.token)?;
         write!(f, "{}", self.return_value)?;
         write!(f, ";")
     }
@@ -109,7 +109,7 @@ impl From<ReturnStatement> for Statement {
 }
 
 pub struct ExpressionStatement {
-    pub stmt_token: Token,
+    pub token: Token,
     pub expression: Expression,
 }
 
@@ -163,20 +163,20 @@ pub enum Expression {
 }
 
 impl IsNode for Expression {
-    fn token(&self) -> Token {
+    fn token(&self) -> Option<&Token> {
         match self {
-            Expression::Identifier(identifier) => identifier.token,
-            Expression::StringLit(string_literal) => string_literal.token,
-            Expression::IntLit(integer_literal) => integer_literal.token,
-            Expression::PreExp(prefix_expression) => prefix_expression.token,
-            Expression::InExp(infix_expression) => infix_expression.token,
-            Expression::BoolLit(boolean) => boolean.token,
-            Expression::IfExp(if_expression) => if_expression.token,
-            Expression::FncLit(function_literal) => function_literal.token,
-            Expression::CallExp(call_expression) => call_expression.token,
-            Expression::ArrayExp(array_expression) => array_expression.token,
-            Expression::IndexExp(index_expression) => index_expression.token,
-            Expression::HashLit(hash_literal) => hash_literal.token,
+            Expression::Identifier(identifier) => Some(&identifier.token),
+            Expression::StringLit(string_literal) => Some(&string_literal.token),
+            Expression::IntLit(integer_literal) => Some(&integer_literal.token),
+            Expression::PreExp(prefix_expression) => Some(&prefix_expression.token),
+            Expression::InExp(infix_expression) => Some(&infix_expression.token),
+            Expression::BoolLit(boolean) => Some(&boolean.token),
+            Expression::IfExp(if_expression) => Some(&if_expression.token),
+            Expression::FncLit(function_literal) => Some(&function_literal.token),
+            Expression::CallExp(call_expression) => Some(&call_expression.token),
+            Expression::ArrayExp(array_expression) => Some(&array_expression.token),
+            Expression::IndexExp(index_expression) => Some(&index_expression.token),
+            Expression::HashLit(hash_literal) => Some(&hash_literal.token),
         }
     }
 
@@ -188,9 +188,9 @@ impl IsNode for Expression {
 impl Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Expression::Identifier(identifier) => write!(f, "{}", identifier.value),
-            Expression::StringLit(string_literal) => write!(f, "{}", string_literal.token()),
-            Expression::IntLit(integer_literal) => write!(f, "{}", integer_literal.token()),
+            Expression::Identifier(identifier) => write!(f, "{identifier}"),
+            Expression::StringLit(string_literal) => write!(f, "{}", string_literal.token),
+            Expression::IntLit(integer_literal) => write!(f, "{}", integer_literal.token),
             Expression::PreExp(prefix_expression) => write!(
                 f,
                 "({}{})",
@@ -201,7 +201,7 @@ impl Display for Expression {
                 "({} {} {})",
                 infix_expression.left, infix_expression.operator, infix_expression.right
             ),
-            Expression::BoolLit(boolean) => write!(f, "{}", self.token()),
+            Expression::BoolLit(boolean) => write!(f, "{}", boolean.token),
             Expression::IfExp(if_expression) => {
                 write!(f, "if {} ", if_expression.condition)?;
                 write!(f, "{}", if_expression.consequence)?;
@@ -211,7 +211,7 @@ impl Display for Expression {
                 Ok(())
             }
             Expression::FncLit(function_literal) => {
-                write!(f, "{} (", function_literal.token())?;
+                write!(f, "{} (", function_literal.token)?;
                 let para_lists = function_literal
                     .parameters
                     .iter()
@@ -265,6 +265,12 @@ pub struct Identifier {
 impl From<Identifier> for Expression {
     fn from(v: Identifier) -> Expression {
         Expression::Identifier(v)
+    }
+}
+
+impl Display for Identifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
     }
 }
 

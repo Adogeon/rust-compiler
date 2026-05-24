@@ -473,26 +473,3 @@ fn test_hash_index_expression() -> Result<(), String> {
 
     Ok(())
 }
-
-#[test]
-fn test_quotes() -> Result<(), String> {
-    let test_cases = vec![
-        ("quote(5+8)", "(5 + 8)"),
-        ("quote(foobar)", "foobar"),
-        ("quote(foobar + barfoo)", "(foobar + barfoo)"),
-    ];
-
-    for (input, expected) in test_cases {
-        let eval = test_eval(input)?;
-        if let Object::QUOTE(v) = eval {
-            match v.node.token_literal() {
-                Some(_) => assert_eq!(v.node.to_string(), expected),
-                None => return Err("quote.Node is null".to_string()),
-            }
-        } else {
-            return Err(format!("expect Object::NODE. got {}", eval.ob_type()));
-        }
-    }
-
-    Ok(())
-}

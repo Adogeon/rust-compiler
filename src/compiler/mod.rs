@@ -20,7 +20,7 @@ impl Compiler {
         }
     }
 
-    fn compile(&self, node: impl ast::Node) -> Result<(), String> {
+    fn compile(&self, node: impl ast::IsNode) -> Result<(), String> {
         Ok(())
     }
 

@@ -1,13 +1,14 @@
 use super::*;
-use crate::ast::{Node, Statement};
+use crate::ast::{IsNode, Statement};
 use crate::lexer::Lexer;
 use std::boxed::Box;
 use std::collections::HashMap;
 
 fn test_let_statement(stmt: &Statement, name: String) -> Result<(), String> {
-    let stmt_literal = stmt.token_literal().unwrap_or("blank");
+    let stmt_literal = stmt.token().unwrap();
     assert_eq!(
-        "let", stmt_literal,
+        "let",
+        stmt_literal.to_string(),
         "stmt_literal is not 'let', got ={}",
         stmt_literal
     );
@@ -82,16 +83,13 @@ fn test_return_statements() -> Result<(), String> {
     );
 
     for stmt in program.statements {
-        if let Statement::RetStmt(return_stmt) = stmt.as_ref() {
-            let stmt_literal = return_stmt.token_literal().unwrap_or("blank");
-            assert_eq!(
-                "return", stmt_literal,
-                "return_stmt token literal not 'return', got {}",
-                stmt_literal
-            );
-        } else {
-            panic!("stmt is not of StatementEnum::RetStmt")
-        }
+        let stmt_literal = stmt.token().unwrap();
+        assert_eq!(
+            "return",
+            stmt_literal.to_string(),
+            "return_stmt token literal not 'return', got {}",
+            stmt_literal
+        )
     }
 
     Ok(())
@@ -123,11 +121,13 @@ fn test_interget_literal_expression() -> Result<(), String> {
 
         if let Expression::IntLit(il) = &ex_stmt.expression {
             assert_eq!(5, il.value, "literal.value not {}, got {}", 5, il.value);
-            let tok_lit = il.token_literal().unwrap_or("blank");
+            let tok_lit = il.token.clone();
             assert_eq!(
-                "5", tok_lit,
+                "5",
+                tok_lit.to_string(),
                 "literal.TokenLiteral not {}, got {}",
-                "5", tok_lit
+                "5",
+                tok_lit
             );
         } else {
             panic!("st.Expression is not a IntergerLiteral");
@@ -167,11 +167,13 @@ fn test_boolean_literal_expression() -> Result<(), String> {
                 "literal.value not {}, got {}",
                 true, bl.value
             );
-            let tok_lit = bl.token_literal().unwrap_or("blank");
+            let tok_lit = bl.token.clone();
             assert_eq!(
-                "true", tok_lit,
+                "true",
+                tok_lit.to_string(),
                 "literal.TokenLiteral not {}, got {}",
-                "true", tok_lit
+                "true",
+                tok_lit
             );
         } else {
             panic!("st.Expression is not a BooleanLiteral");
@@ -232,11 +234,11 @@ fn test_integer_literal(il: &Expression, value: i64) -> Result<(), String> {
             value, literal.value
         );
 
-        let tok_lit = literal.token_literal().unwrap_or("blank");
+        let tok_lit = literal.token.clone();
 
         assert_eq!(
             value.to_string(),
-            tok_lit,
+            tok_lit.to_string(),
             "literal.token_literal() not {}, got {}",
             value.to_string(),
             tok_lit
@@ -255,11 +257,11 @@ fn test_boolean_literal(bl: &Expression, value: bool) -> Result<(), String> {
             value, literal.value
         );
 
-        let tok_lit = literal.token_literal().unwrap_or("blank");
+        let tok_lit = literal.token.clone();
 
         assert_eq!(
             value.to_string(),
-            tok_lit,
+            tok_lit.to_string(),
             "literal.token_literal() not {}, got {}",
             value.to_string(),
             tok_lit
@@ -277,9 +279,10 @@ fn test_identifier(ie: &Expression, value: String) -> Result<(), String> {
             "ident.value not {value}. got={}",
             ident.value
         );
-        let tok_lit = ident.token_literal().unwrap_or("blank");
+        let tok_lit = ident.token.clone();
         assert_eq!(
-            value, tok_lit,
+            value,
+            tok_lit.to_string(),
             "ident.TokenLiteral not {value}, got {tok_lit}"
         );
     } else {

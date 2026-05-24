@@ -1,5 +1,4 @@
-use crate::ast::{self, Expression, Identifier, Node, Statement};
-use crate::evaluator::Evaluable;
+use crate::ast::{Expression, Identifier, IsNode, Statement};
 use environment::Env;
 use hash::{HashKey, HashPair};
 use std::collections::HashMap;
@@ -59,14 +58,8 @@ impl PartialEq for HashObject {
     }
 }
 
-pub struct Quote<T: Node> {
+pub struct Quote<T: IsNode> {
     pub node: T,
-}
-
-impl PartialEq for Quote<Expression> {
-    fn eq(&self, _other: &Self) -> bool {
-        false
-    }
 }
 
 #[derive(PartialEq, Clone)]
@@ -80,7 +73,6 @@ pub enum Object {
     ERROR(String),
     ARRAY(Vec<Object>),
     HASH(Rc<HashObject>),
-    QUOTE(Rc<Quote<Expression>>),
     NULL,
 }
 
@@ -126,9 +118,6 @@ impl Object {
                 write!(buffer, "[ {} ]", hash_list).expect("Can't inspect hash");
                 buffer
             }
-            Self::QUOTE(val) => {
-                format!("QUOTE({})", val.node.to_string())
-            }
             Self::NULL => String::from("null"),
         }
     }
@@ -144,7 +133,6 @@ impl Object {
             Self::BUILTIN(_) => "BUILTIN_FN",
             Self::ARRAY(_) => "ARRAY",
             Self::HASH(_) => "HASH_OBJECT",
-            Self::QUOTE(_) => "QUOTE_OBJECT",
             Self::NULL => "NULL",
         }
     }

@@ -124,7 +124,7 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_let_stmt(&mut self) -> Result<Statement, ParseError> {
-        let stmt_token = self.cur_token.clone();
+        let token = self.cur_token.clone();
 
         self.expect_peek(TType::IDENT)
             .ok_or(ParseError::MissingExpectedToken(TType::IDENT))?;
@@ -145,7 +145,7 @@ impl<'a> Parser<'a> {
         }
 
         Ok(ast::LetStatement {
-            stmt_token,
+            token,
             name: stmt_name,
             value: value,
         }
@@ -162,21 +162,21 @@ impl<'a> Parser<'a> {
         }
 
         Ok(ast::ReturnStatement {
-            stmt_token: token,
+            token,
             return_value: Box::new(stmt_value),
         }
         .into())
     }
 
     fn parse_expression_stmt(&mut self) -> Result<Statement, ParseError> {
-        let exp_tok = self.cur_token.clone();
+        let token = self.cur_token.clone();
         let express = self.parse_expression(Precedent::LOWEST)?;
         if self.peek_tok_is(TType::SEMICOLON).is_some() {
             self.next_tok();
         }
 
         Ok(ast::ExpressionStatement {
-            stmt_token: exp_tok,
+            token,
             expression: express,
         }
         .into())

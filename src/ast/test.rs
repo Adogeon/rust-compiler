@@ -5,7 +5,7 @@ use crate::token::{TType, Token};
 fn test_write_string() {
     let p = Program {
         statements: vec![Box::new(Statement::LetStmt(LetStatement {
-            stmt_token: Token {
+            token: Token {
                 tok_type: TType::LET,
                 tok_literal: String::from("let"),
             },
