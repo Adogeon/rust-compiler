@@ -11,15 +11,15 @@ fn test_write_string() {
             },
             name: Identifier {
                 token: Token {
-                    tok_type: TType::IDENT,
+                    tok_type: TType::LET,
                     tok_literal: String::from("myVar"),
                 },
                 value: String::from("myVar"),
             },
             value: Expression::Identifier(Identifier {
                 token: Token {
-                    tok_type: TType::IDENT,
-                    tok_literal: String::from("anotherVar"),
+                    tok_type: TType::LET,
+                    tok_literal: String::from("anotherVarr"),
                 },
                 value: String::from("anotherVar"),
             }),

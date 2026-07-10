@@ -3,6 +3,7 @@ use std::fmt::{self, Display};
 #[derive(Debug, PartialEq, Clone)]
 pub enum TType {
     ILLEGAL,
+    SOF,
     EOF,
     // Identifiers + Literals
     IDENT,

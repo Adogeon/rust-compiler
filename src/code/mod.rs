@@ -1,13 +1,15 @@
 use std::fmt::{Display, Write};
-type Opcode = u8;
+pub type Opcode = u8;
 
 pub const OP_CONSTANT: Opcode = 0b0;
+pub const OP_ADD: Opcode = 0b1;
 
 type Definition = (&'static str, Vec<u16>);
 
 fn look_up(op_code: Opcode) -> Option<Definition> {
     match op_code {
         OP_CONSTANT => Some(("OpConstant", vec![2])),
+        OP_ADD => Some(("OpAdd", vec![])),
         _ => None,
     }
 }
@@ -24,6 +26,7 @@ impl Instruction {
                 result.extend_from_slice(encode_bytes);
                 Self(result)
             }
+            OP_ADD => Self(vec![op_code]),
             _ => Self(Vec::new()),
         }
     }
@@ -109,21 +112,10 @@ impl Instruction {
         };
 
         match operand_count {
+            0 => format!("{}", def.0),
             1 => format!("{} {}", def.0, operands[0]),
             _ => format!("Error: unhandle operand_count for {}", def.0),
         }
-    }
-}
-
-pub fn make(op_code: Opcode, operands: &[u16]) -> Vec<u8> {
-    match op_code {
-        OP_CONSTANT => {
-            let mut result = vec![op_code];
-            let encode_bytes = &operands[0].to_be_bytes();
-            result.extend_from_slice(encode_bytes);
-            result
-        }
-        _ => Vec::new(),
     }
 }
 

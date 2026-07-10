@@ -2,8 +2,10 @@ use super::*;
 
 #[test]
 fn test_make() -> Result<(), String> {
-    let test_cases: Vec<(u8, &[u16], Vec<u8>)> =
-        vec![(OP_CONSTANT, &[65534], vec![OP_CONSTANT, 255, 254])];
+    let test_cases: Vec<(u8, &[u16], Vec<u8>)> = vec![
+        (OP_CONSTANT, &[65534], vec![OP_CONSTANT, 255, 254]),
+        (OP_ADD, &[], vec![OP_ADD]),
+    ];
 
     for (op, operands, expected) in test_cases {
         let instruction: Instruction = Instruction::make(op, operands);
@@ -34,14 +36,14 @@ fn test_make() -> Result<(), String> {
 #[test]
 fn test_instructions_string() -> Result<(), String> {
     let instructions = vec![
-        make(OP_CONSTANT, &[1]),
-        make(OP_CONSTANT, &[2]),
-        make(OP_CONSTANT, &[65535]),
+        Instruction::make(OP_ADD, &[]),
+        Instruction::make(OP_CONSTANT, &[2]),
+        Instruction::make(OP_CONSTANT, &[65535]),
     ];
 
-    let expected = "000 OpConstant 1\n003 OpConstant 2\n006 OpConstant 65535\n";
+    let expected = "000 OpAdd\n001 OpConstant 2\n004 OpConstant 65535\n";
 
-    let concatted = Instruction(instructions.concat());
+    let concatted = Instruction::concat_inst(instructions);
     assert_eq!(
         Instruction::string(&concatted),
         expected,

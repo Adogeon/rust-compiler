@@ -7,6 +7,7 @@ mod object;
 mod parser;
 mod repl;
 mod token;
+mod vm;
 
 use std::io::{stdin, stdout};
 

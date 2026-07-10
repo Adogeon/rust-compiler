@@ -3,14 +3,58 @@ use std::fmt::Display;
 use std::rc::Rc;
 
 pub enum NodeType {
-    Program,
-    Expression,
-    Statement,
+    PNode(Program),
+    ENode(Expression),
+    SNode(Statement),
+}
+
+impl Display for NodeType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::PNode(prog) => write!(f, "{}", prog),
+            Self::ENode(exps) => write!(f, "{}", exps),
+            Self::SNode(stmt) => write!(f, "{}", stmt),
+        }
+    }
 }
 
 pub trait IsNode: Display {
     fn token(&self) -> Option<&Token>;
-    fn node_type() -> NodeType;
+    fn node_type(self) -> NodeType;
+}
+
+pub struct ASTNode {
+    pub value: NodeType,
+}
+
+impl From<Program> for ASTNode {
+    fn from(prog: Program) -> Self {
+        Self {
+            value: NodeType::PNode(prog),
+        }
+    }
+}
+
+impl From<Statement> for ASTNode {
+    fn from(stmt: Statement) -> Self {
+        Self {
+            value: NodeType::SNode(stmt),
+        }
+    }
+}
+
+impl From<Expression> for ASTNode {
+    fn from(exps: Expression) -> Self {
+        Self {
+            value: NodeType::ENode(exps),
+        }
+    }
+}
+
+impl Display for ASTNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
 }
 
 pub struct Program {
@@ -20,14 +64,14 @@ pub struct Program {
 impl IsNode for Program {
     fn token(&self) -> Option<&Token> {
         if self.statements.len() > 0 {
-            self.statements[0].token()
+            Some(self.statements[0].token().unwrap())
         } else {
             None
         }
     }
 
-    fn node_type() -> NodeType {
-        NodeType::Program
+    fn node_type(self) -> NodeType {
+        NodeType::PNode(self)
     }
 }
 
@@ -57,14 +101,36 @@ impl IsNode for Statement {
         }
     }
 
-    fn node_type() -> NodeType {
-        NodeType::Statement
+    fn node_type(self) -> NodeType {
+        NodeType::SNode(self)
     }
 }
 
 impl Display for Statement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.token().unwrap())
+        match self {
+            Statement::LetStmt(let_statement) => {
+                write!(f, "{} {} = ", let_statement.token, let_statement.name)?;
+                write!(f, "{}", let_statement.value)?;
+
+                write!(f, ";")
+            }
+            Statement::RetStmt(return_statement) => {
+                write!(f, "{} ", return_statement.token)?;
+                write!(f, "{}", return_statement.return_value)?;
+                write!(f, ";")
+            }
+            Statement::ExpStmt(expression_statement) => {
+                write!(f, "{}", expression_statement.expression)
+            }
+            Statement::BlcStmt(block_statement) => {
+                for stmt in &block_statement.statements {
+                    write!(f, "{stmt}")?;
+                }
+
+                Ok(())
+            }
+        }
     }
 }
 
@@ -72,15 +138,6 @@ pub struct LetStatement {
     pub token: Token,
     pub name: Identifier,
     pub value: Expression,
-}
-
-impl Display for LetStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {} = ", self.token, self.name)?;
-        write!(f, "{}", self.value)?;
-
-        write!(f, ";")
-    }
 }
 
 impl From<LetStatement> for Statement {
@@ -94,14 +151,6 @@ pub struct ReturnStatement {
     pub return_value: Box<Expression>,
 }
 
-impl Display for ReturnStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} ", self.token)?;
-        write!(f, "{}", self.return_value)?;
-        write!(f, ";")
-    }
-}
-
 impl From<ReturnStatement> for Statement {
     fn from(v: ReturnStatement) -> Statement {
         Statement::RetStmt(v)
@@ -113,12 +162,6 @@ pub struct ExpressionStatement {
     pub expression: Expression,
 }
 
-impl Display for ExpressionStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.expression)
-    }
-}
-
 impl From<ExpressionStatement> for Statement {
     fn from(v: ExpressionStatement) -> Statement {
         Statement::ExpStmt(v)
@@ -128,16 +171,6 @@ impl From<ExpressionStatement> for Statement {
 pub struct BlockStatement {
     pub token: Token,
     pub statements: Vec<Statement>,
-}
-
-impl Display for BlockStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for stmt in &self.statements {
-            write!(f, "{stmt}")?;
-        }
-
-        Ok(())
-    }
 }
 
 impl From<BlockStatement> for Statement {
@@ -180,8 +213,8 @@ impl IsNode for Expression {
         }
     }
 
-    fn node_type() -> NodeType {
-        NodeType::Expression
+    fn node_type(self) -> NodeType {
+        NodeType::ENode(self)
     }
 }
 
@@ -189,8 +222,8 @@ impl Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Expression::Identifier(identifier) => write!(f, "{identifier}"),
-            Expression::StringLit(string_literal) => write!(f, "{}", string_literal.token),
-            Expression::IntLit(integer_literal) => write!(f, "{}", integer_literal.token),
+            Expression::StringLit(string_literal) => write!(f, "{}", string_literal.value),
+            Expression::IntLit(integer_literal) => write!(f, "{}", integer_literal.value),
             Expression::PreExp(prefix_expression) => write!(
                 f,
                 "({}{})",
@@ -201,7 +234,7 @@ impl Display for Expression {
                 "({} {} {})",
                 infix_expression.left, infix_expression.operator, infix_expression.right
             ),
-            Expression::BoolLit(boolean) => write!(f, "{}", boolean.token),
+            Expression::BoolLit(boolean) => write!(f, "{}", boolean.value),
             Expression::IfExp(if_expression) => {
                 write!(f, "if {} ", if_expression.condition)?;
                 write!(f, "{}", if_expression.consequence)?;

@@ -2,7 +2,7 @@ use super::*;
 use crate::evaluator::test::test_integer_object;
 use crate::{
     ast::Program,
-    code::{Instruction, OP_CONSTANT},
+    code::{Instruction, OP_ADD, OP_CONSTANT},
     lexer::Lexer,
     object::Object,
     parser::Parser,
@@ -22,6 +22,7 @@ fn test_integer_arithmetic() -> Result<(), String> {
         expected_instructions: vec![
             Instruction::make(OP_CONSTANT, &[0 as u16]),
             Instruction::make(OP_CONSTANT, &[1 as u16]),
+            Instruction::make(OP_ADD, &[]),
         ],
     }];
 
@@ -31,8 +32,8 @@ fn test_integer_arithmetic() -> Result<(), String> {
 fn run_compiler_test(test_cases: Vec<CompilerTestCase>) -> Result<(), String> {
     for tc in test_cases {
         let program = parse(tc.input);
-        let compiler = Compiler::new();
-        compiler.compile(program)?;
+        let mut compiler = Compiler::new();
+        compiler.compile(program.into())?;
         let bytecode = compiler.bytecode();
         test_instructions(tc.expected_instructions, bytecode.instruction)?;
         test_constants(tc.expected_constants, bytecode.constants)?;
@@ -40,7 +41,7 @@ fn run_compiler_test(test_cases: Vec<CompilerTestCase>) -> Result<(), String> {
     Ok(())
 }
 
-fn parse(input: &str) -> ast::Program {
+fn parse(input: &str) -> Program {
     let l = Lexer::new(input);
     let mut p = Parser::new(l);
     p.parse_program()
@@ -78,6 +79,9 @@ fn test_instructions(
         Instruction::string(&concatted),
         Instruction::string(&instruction)
     );
+
+    println!("{}", Instruction::string(&concatted));
+    println!("{}", Instruction::string(&instruction));
 
     for (i, ins) in concatted.slices().iter().enumerate() {
         assert_eq!(
