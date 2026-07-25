@@ -1,7 +1,9 @@
-use crate::evaluator::eval;
+use crate::compiler::Compiler;
 use crate::lexer::Lexer;
 use crate::object::environment::Environment;
+use crate::object::Object;
 use crate::parser::{ParseError, Parser};
+use crate::vm::VM;
 use std::io::{self, BufRead, Write};
 
 pub fn start(mut in_handler: io::StdinLock, mut out_handler: io::StdoutLock) {
@@ -27,9 +29,12 @@ pub fn start(mut in_handler: io::StdinLock, mut out_handler: io::StdoutLock) {
             }
         };
 
-        let evaluated = eval(&program, env.clone());
-
-        writeln!(out_handler, "{}", evaluated).unwrap();
+        let mut comp = Compiler::new();
+        let _ = comp.compile(program.into());
+        let mut machine = VM::new(comp.bytecode());
+        let _ = machine.run();
+        let stack_top = machine.stack_top().unwrap_or_else(|| Object::NULL);
+        writeln!(out_handler, "{}", stack_top.inspect()).unwrap();
     }
 }
 

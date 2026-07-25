@@ -4,7 +4,7 @@ use crate::object::Object;
 
 const STACKSIZE: usize = 2048;
 
-struct VM {
+pub struct VM {
     constants: Vec<Object>,
     instruction: Instruction,
     stack: Vec<Object>,

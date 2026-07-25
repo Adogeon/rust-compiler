@@ -77,7 +77,7 @@ pub enum Object {
 }
 
 impl Object {
-    fn inspect(&self) -> String {
+    pub fn inspect(&self) -> String {
         match self {
             Self::INTEGER(val) => format!("{}", val),
             Self::STRING(val) => format!("{}", val),
