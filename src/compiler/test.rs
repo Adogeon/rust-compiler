@@ -16,16 +16,58 @@ struct CompilerTestCase {
 
 #[test]
 fn test_integer_arithmetic() -> Result<(), String> {
-    let test_cases: Vec<CompilerTestCase> = vec![CompilerTestCase {
-        input: "1+2",
-        expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
-        expected_instructions: vec![
-            Instruction::make(OP_CONSTANT, &[0 as u16]),
-            Instruction::make(OP_CONSTANT, &[1 as u16]),
-            Instruction::make(OP_ADD, &[]),
-            Instruction::make(OP_POP, &[]),
-        ],
-    }];
+    let test_cases: Vec<CompilerTestCase> = vec![
+        CompilerTestCase {
+            input: "1+2",
+            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0 as u16]),
+                Instruction::make(code::OP_CONSTANT, &[1 as u16]),
+                Instruction::make(code::OP_ADD, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "1+2",
+            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0 as u16]),
+                Instruction::make(code::OP_CONSTANT, &[1 as u16]),
+                Instruction::make(code::OP_ADD, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "1-2",
+            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0 as u16]),
+                Instruction::make(code::OP_CONSTANT, &[1 as u16]),
+                Instruction::make(code::OP_SUB, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "1*2",
+            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0 as u16]),
+                Instruction::make(code::OP_CONSTANT, &[1 as u16]),
+                Instruction::make(code::OP_MUL, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "2/1",
+            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[1 as u16]),
+                Instruction::make(code::OP_CONSTANT, &[0 as u16]),
+                Instruction::make(code::OP_DIV, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+    ];
 
     run_compiler_test(test_cases)
 }

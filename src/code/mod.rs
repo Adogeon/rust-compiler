@@ -2,8 +2,11 @@ use std::fmt::{Display, Write};
 pub type Opcode = u8;
 
 pub const OP_CONSTANT: Opcode = 0b0;
-pub const OP_ADD: Opcode = 0b1;
-pub const OP_POP: Opcode = 0b10;
+pub const OP_POP: Opcode = 0b1;
+pub const OP_ADD: Opcode = 0b10;
+pub const OP_SUB: Opcode = 0b11;
+pub const OP_MUL: Opcode = 0b100;
+pub const OP_DIV: Opcode = 0b101;
 
 type Definition = (&'static str, Vec<u16>);
 
@@ -12,6 +15,9 @@ fn look_up(op_code: Opcode) -> Option<Definition> {
         OP_CONSTANT => Some(("OpConstant", vec![2])),
         OP_ADD => Some(("OpAdd", vec![])),
         OP_POP => Some(("OpPop", vec![])),
+        OP_SUB => Some(("OpSub", vec![])),
+        OP_MUL => Some(("OpMul", vec![])),
+        OP_DIV => Some(("OpDiv", vec![])),
         _ => None,
     }
 }
@@ -30,6 +36,9 @@ impl Instruction {
             }
             OP_ADD => Self(vec![op_code]),
             OP_POP => Self(vec![op_code]),
+            OP_SUB => Self(vec![op_code]),
+            OP_MUL => Self(vec![op_code]),
+            OP_DIV => Self(vec![op_code]),
             _ => Self(Vec::new()),
         }
     }

@@ -33,7 +33,7 @@ pub fn start(mut in_handler: io::StdinLock, mut out_handler: io::StdoutLock) {
         let _ = comp.compile(program.into());
         let mut machine = VM::new(comp.bytecode());
         let _ = machine.run();
-        let stack_top = machine.stack_top().unwrap_or_else(|| Object::NULL);
+        let stack_top = machine.last_popped_stack_elm();
         writeln!(out_handler, "{}", stack_top.inspect()).unwrap();
     }
 }

@@ -25,6 +25,38 @@ fn test_integer_arithmetic() -> Result<(), String> {
             input: "1 + 2",
             expected: Object::INTEGER(3),
         },
+        VmTestCase {
+            input: "1 - 2",
+            expected: Object::INTEGER(-1),
+        },
+        VmTestCase {
+            input: "1 * 2",
+            expected: Object::INTEGER(2),
+        },
+        VmTestCase {
+            input: "4 / 2",
+            expected: Object::INTEGER(2),
+        },
+        VmTestCase {
+            input: "50 / 2 * 2 + 10 - 5",
+            expected: Object::INTEGER(55),
+        },
+        VmTestCase {
+            input: "2 * 2 * 2 * 2 * 2",
+            expected: Object::INTEGER(32),
+        },
+        VmTestCase {
+            input: "5 * 2 + 10",
+            expected: Object::INTEGER(20),
+        },
+        VmTestCase {
+            input: "5 + 2 * 10",
+            expected: Object::INTEGER(25),
+        },
+        VmTestCase {
+            input: "5 * (2 + 10)",
+            expected: Object::INTEGER(60),
+        },
     ];
 
     run_vm_tests(test_cs)
@@ -37,8 +69,8 @@ fn run_vm_tests(tc: Vec<VmTestCase>) -> Result<(), String> {
         comp.compile(prog.into())?;
         let mut vm = VM::new(comp.bytecode());
         vm.run()?;
-        let stack_ele = vm.stack_top();
-        test_exepected_object(test.expected, stack_ele.unwrap())?;
+        let stack_ele = vm.last_popped_stack_elm();
+        test_exepected_object(test.expected, stack_ele)?;
     }
 
     Ok(())

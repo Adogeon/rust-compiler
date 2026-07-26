@@ -38,19 +38,12 @@ impl VM {
                     self.push(cst)?;
                     ip += 2;
                 }
-                code::OP_ADD => {
-                    let left_value = if let Object::INTEGER(val) = self.pop() {
-                        val
-                    } else {
-                        return Err(format!("object is not interger"));
-                    };
-                    let right_value = if let Object::INTEGER(val) = self.pop() {
-                        val
-                    } else {
-                        return Err(format!("object is not interger"));
-                    };
-                    let result = left_value + right_value;
-                    self.push(Object::INTEGER(result))?
+                code::OP_ADD | code::OP_MUL | code::OP_SUB | code::OP_DIV => {
+                    let result = self.execute_binary_operation(op)?;
+                    self.push(result)?
+                }
+                code::OP_POP => {
+                    self.pop();
                 }
                 _ => todo!(),
             }
@@ -84,9 +77,34 @@ impl VM {
     }
 
     fn pop(&mut self) -> Object {
-        let result = self.stack.remove(self.sp - 1);
+        let result = self.stack[self.sp - 1].clone();
         self.sp -= 1;
         result
+    }
+
+    fn execute_binary_operation(&mut self, op: code::Opcode) -> Result<Object, String> {
+        let left_value = if let Object::INTEGER(val) = self.pop() {
+            val
+        } else {
+            return Err(format!("object is not interger"));
+        };
+        let right_value = if let Object::INTEGER(val) = self.pop() {
+            val
+        } else {
+            return Err(format!("object is not interger"));
+        };
+        let result = match op {
+            code::OP_ADD => left_value + right_value,
+            code::OP_SUB => left_value - right_value,
+            code::OP_MUL => left_value * right_value,
+            code::OP_DIV => left_value / right_value,
+            _ => return Err(format!("Something is terribly wrong!")),
+        };
+        Ok(Object::INTEGER(result))
+    }
+
+    pub fn last_popped_stack_elm(&self) -> Object {
+        self.stack[self.sp].clone()
     }
 }
 
