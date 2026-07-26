@@ -3,6 +3,7 @@ pub type Opcode = u8;
 
 pub const OP_CONSTANT: Opcode = 0b0;
 pub const OP_ADD: Opcode = 0b1;
+pub const OP_POP: Opcode = 0b10;
 
 type Definition = (&'static str, Vec<u16>);
 
@@ -10,6 +11,7 @@ fn look_up(op_code: Opcode) -> Option<Definition> {
     match op_code {
         OP_CONSTANT => Some(("OpConstant", vec![2])),
         OP_ADD => Some(("OpAdd", vec![])),
+        OP_POP => Some(("OpPop", vec![])),
         _ => None,
     }
 }
@@ -27,6 +29,7 @@ impl Instruction {
                 Self(result)
             }
             OP_ADD => Self(vec![op_code]),
+            OP_POP => Self(vec![op_code]),
             _ => Self(Vec::new()),
         }
     }

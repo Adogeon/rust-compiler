@@ -23,6 +23,7 @@ fn test_integer_arithmetic() -> Result<(), String> {
             Instruction::make(OP_CONSTANT, &[0 as u16]),
             Instruction::make(OP_CONSTANT, &[1 as u16]),
             Instruction::make(OP_ADD, &[]),
+            Instruction::make(OP_POP, &[]),
         ],
     }];
 

@@ -2,7 +2,7 @@ use std::error::Error;
 
 use super::code::{Instruction, Opcode};
 use super::object;
-use crate::code::{OP_ADD, OP_CONSTANT};
+use crate::code::{OP_ADD, OP_CONSTANT, OP_POP};
 use crate::{
     ast::{ASTNode, Expression, NodeType, Statement},
     object::Object,
@@ -37,7 +37,10 @@ impl Compiler {
             NodeType::SNode(stmt) => match stmt {
                 Statement::LetStmt(let_stmt) => todo!(),
                 Statement::RetStmt(ret_stmt) => todo!(),
-                Statement::ExpStmt(exp_stmt) => self.compile(exp_stmt.expression.into())?,
+                Statement::ExpStmt(exp_stmt) => {
+                    self.compile(exp_stmt.expression.into())?;
+                    self.emit(OP_POP, &[]);
+                }
                 Statement::BlcStmt(blc_stmt) => todo!(),
             },
             NodeType::ENode(exps) => match exps {
