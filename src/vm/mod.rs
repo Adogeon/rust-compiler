@@ -42,6 +42,13 @@ impl VM {
                     let result = self.execute_binary_operation(op)?;
                     self.push(result)?
                 }
+                code::OP_TRUE | code::OP_FALSE => {
+                    if op == code::OP_TRUE {
+                        self.push(Object::BOOLEAN(true))?;
+                    } else {
+                        self.push(Object::BOOLEAN(false))?;
+                    }
+                }
                 code::OP_POP => {
                     self.pop();
                 }

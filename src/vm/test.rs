@@ -62,6 +62,21 @@ fn test_integer_arithmetic() -> Result<(), String> {
     run_vm_tests(test_cs)
 }
 
+#[test]
+fn test_boolean_expression() -> Result<(), String> {
+    let tc = vec![
+        VmTestCase {
+            input: "true",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "false",
+            expected: Object::BOOLEAN(false),
+        },
+    ];
+    run_vm_tests(tc)
+}
+
 fn run_vm_tests(tc: Vec<VmTestCase>) -> Result<(), String> {
     for test in tc {
         let prog = parse(test.input);
@@ -80,6 +95,9 @@ fn test_exepected_object(expected: Object, actual: Object) -> Result<(), String>
     match expected {
         Object::INTEGER(int) => {
             test_integer_object(&actual, int)?;
+        }
+        Object::BOOLEAN(val) => {
+            test_boolean_object(&actual, val)?;
         }
         _ => return Err(String::from("expected type isn't implement")),
     };
@@ -106,5 +124,17 @@ pub fn test_integer_object(obj: &Object, expected: i64) -> Result<(), String> {
         }
     } else {
         Err(String::from("object is not an Integer Object"))
+    }
+}
+
+fn test_boolean_object(input: &Object, expected: bool) -> Result<(), String> {
+    if let Object::BOOLEAN(s) = input {
+        if *s == expected {
+            Ok(())
+        } else {
+            Err(format!("expected {expected}, got={s}"))
+        }
+    } else {
+        Err(format!("input is not a Boolean Object"))
     }
 }
