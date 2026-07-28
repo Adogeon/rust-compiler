@@ -62,7 +62,13 @@ impl Compiler {
                         _ => return Err(format!("unknown operator {}", infix_expression.operator)),
                     };
                 }
-                Expression::BoolLit(boolean) => todo!(),
+                Expression::BoolLit(boolean) => {
+                    if boolean.value {
+                        self.emit(code::OP_TRUE, &[]);
+                    } else {
+                        self.emit(code::OP_FALSE, &[]);
+                    }
+                }
                 Expression::IfExp(if_expression) => todo!(),
                 Expression::FncLit(function_literal) => todo!(),
                 Expression::CallExp(call_expression) => todo!(),

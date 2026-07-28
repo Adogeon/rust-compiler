@@ -1,12 +1,14 @@
 use std::fmt::{Display, Write};
 pub type Opcode = u8;
 
-pub const OP_CONSTANT: Opcode = 0b0;
-pub const OP_POP: Opcode = 0b1;
-pub const OP_ADD: Opcode = 0b10;
-pub const OP_SUB: Opcode = 0b11;
-pub const OP_MUL: Opcode = 0b100;
-pub const OP_DIV: Opcode = 0b101;
+pub const OP_FALSE: Opcode = 0b0;
+pub const OP_TRUE: Opcode = 0b1;
+pub const OP_CONSTANT: Opcode = 0b10;
+pub const OP_POP: Opcode = 0b11;
+pub const OP_ADD: Opcode = 0b100;
+pub const OP_SUB: Opcode = 0b101;
+pub const OP_MUL: Opcode = 0b110;
+pub const OP_DIV: Opcode = 0b111;
 
 type Definition = (&'static str, Vec<u16>);
 
@@ -39,6 +41,8 @@ impl Instruction {
             OP_SUB => Self(vec![op_code]),
             OP_MUL => Self(vec![op_code]),
             OP_DIV => Self(vec![op_code]),
+            OP_TRUE => Self(vec![op_code]),
+            OP_FALSE => Self(vec![op_code]),
             _ => Self(Vec::new()),
         }
     }

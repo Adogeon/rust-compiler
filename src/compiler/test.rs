@@ -136,3 +136,27 @@ fn test_instructions(
 
     Ok(())
 }
+
+#[test]
+fn test_boolean_expressions() -> Result<(), String> {
+    let tc = vec![
+        CompilerTestCase {
+            input: "true",
+            expected_constants: Vec::new(),
+            expected_instructions: vec![
+                Instruction::make(code::OP_TRUE, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "false",
+            expected_constants: Vec::new(),
+            expected_instructions: vec![
+                Instruction::make(code::OP_FALSE, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+    ];
+
+    run_compiler_test(tc)
+}
