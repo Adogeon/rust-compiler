@@ -59,10 +59,10 @@ fn test_integer_arithmetic() -> Result<(), String> {
         },
         CompilerTestCase {
             input: "2/1",
-            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_constants: vec![Object::INTEGER(2), Object::INTEGER(1)],
             expected_instructions: vec![
-                Instruction::make(code::OP_CONSTANT, &[1 as u16]),
                 Instruction::make(code::OP_CONSTANT, &[0 as u16]),
+                Instruction::make(code::OP_CONSTANT, &[1 as u16]),
                 Instruction::make(code::OP_DIV, &[]),
                 Instruction::make(code::OP_POP, &[]),
             ],
@@ -122,9 +122,6 @@ fn test_instructions(
         Instruction::string(&concatted),
         Instruction::string(&instruction)
     );
-
-    println!("{}", Instruction::string(&concatted));
-    println!("{}", Instruction::string(&instruction));
 
     for (i, ins) in concatted.slices().iter().enumerate() {
         assert_eq!(

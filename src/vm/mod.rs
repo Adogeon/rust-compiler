@@ -83,24 +83,43 @@ impl VM {
     }
 
     fn execute_binary_operation(&mut self, op: code::Opcode) -> Result<Object, String> {
-        let left_value = if let Object::INTEGER(val) = self.pop() {
-            val
-        } else {
-            return Err(format!("object is not interger"));
-        };
-        let right_value = if let Object::INTEGER(val) = self.pop() {
-            val
-        } else {
-            return Err(format!("object is not interger"));
-        };
-        let result = match op {
-            code::OP_ADD => left_value + right_value,
-            code::OP_SUB => left_value - right_value,
-            code::OP_MUL => left_value * right_value,
-            code::OP_DIV => left_value / right_value,
-            _ => return Err(format!("Something is terribly wrong!")),
-        };
-        Ok(Object::INTEGER(result))
+        let right = self.pop();
+        let left = self.pop();
+
+        if matches!(left, Object::INTEGER(_)) && matches!(right, Object::INTEGER(_)) {
+            let Object::INTEGER(left_value) = left else {
+                return Err(format!("Left is not an Integer Object"));
+            };
+            let Object::INTEGER(right_value) = right else {
+                return Err(format!("Right is not an Integer Object"));
+            };
+
+            println!("left: {}", left_value);
+            println!("right: {}", right_value);
+            println!("op: {}", op);
+
+            return Ok(Object::INTEGER(self.execture_binary_integer_operation(
+                op,
+                left_value,
+                right_value,
+            )));
+        }
+
+        Err(format!(
+            "There is not support for {} and {}",
+            left.ob_type(),
+            right.ob_type()
+        ))
+    }
+
+    fn execture_binary_integer_operation(&self, op: code::Opcode, left: i64, right: i64) -> i64 {
+        match op {
+            code::OP_ADD => left + right,
+            code::OP_SUB => left - right,
+            code::OP_MUL => left * right,
+            code::OP_DIV => left / right,
+            _ => 0,
+        }
     }
 
     pub fn last_popped_stack_elm(&self) -> Object {
