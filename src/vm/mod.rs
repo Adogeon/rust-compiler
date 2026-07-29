@@ -44,6 +44,10 @@ impl VM {
                     let result = self.execute_binary_operation(op)?;
                     self.push(result)?
                 }
+                code::OP_EQL | code::OP_NEQL | code::OP_GRT => {
+                    let result = self.execute_comparison(op)?;
+                    self.push(result)?
+                }
                 code::OP_TRUE | code::OP_FALSE => {
                     if op == code::OP_TRUE {
                         self.push(TRUE)?;
@@ -133,6 +137,50 @@ impl VM {
 
     pub fn last_popped_stack_elm(&self) -> Object {
         self.stack[self.sp].clone()
+    }
+
+    fn execute_comparison(&mut self, op: u8) -> Result<Object, String> {
+        let right = self.pop();
+        let left = self.pop();
+
+        if matches!(left, Object::INTEGER(_)) && matches!(right, Object::INTEGER(_)) {
+            let Object::INTEGER(left_val) = left else {
+                return Err(format!("Expect Left to be Integer Object"));
+            };
+            let Object::INTEGER(right_val) = right else {
+                return Err(format!("Expect Right to be Integer Object"));
+            };
+
+            return Ok(self.execute_integer_comparison(op, left_val, right_val));
+        }
+
+        match op {
+            code::OP_EQL => Ok(self.native_bool_to_boolean_obj(right == left)),
+            code::OP_NEQL => Ok(self.native_bool_to_boolean_obj(right != left)),
+            _ => Err(format!(
+                "Unknown operator: {} for {} & {}",
+                op,
+                left.ob_type(),
+                right.ob_type()
+            )),
+        }
+    }
+
+    fn execute_integer_comparison(&self, op: u8, left_val: i64, right_val: i64) -> Object {
+        match op {
+            code::OP_EQL => self.native_bool_to_boolean_obj(left_val == right_val),
+            code::OP_NEQL => self.native_bool_to_boolean_obj(left_val != right_val),
+            code::OP_GRT => self.native_bool_to_boolean_obj(left_val > right_val),
+            _ => FALSE,
+        }
+    }
+
+    fn native_bool_to_boolean_obj(&self, input: bool) -> Object {
+        if input {
+            TRUE
+        } else {
+            FALSE
+        }
     }
 }
 

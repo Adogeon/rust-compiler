@@ -73,6 +73,74 @@ fn test_boolean_expression() -> Result<(), String> {
             input: "false",
             expected: Object::BOOLEAN(false),
         },
+        VmTestCase {
+            input: "1 < 2",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "1 > 2",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "1 < 1",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "1 > 1",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "1 == 1",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "1 != 1",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "1 == 2",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "1 != 2",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "true == true",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "false == false",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "true == false",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "true != false",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "false != true",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "(1 < 2) == true",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "(1 < 2) == false",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "(1 > 2) == true",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "(1 > 2) == false",
+            expected: Object::BOOLEAN(true),
+        },
     ];
     run_vm_tests(tc)
 }
