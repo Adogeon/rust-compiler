@@ -52,6 +52,13 @@ impl Compiler {
                 }
                 Expression::PreExp(prefix_expression) => todo!(),
                 Expression::InExp(infix_expression) => {
+                    if (infix_expression.operator.as_str() == "<") {
+                        self.compile(infix_expression.right.clone().into())?;
+                        self.compile(infix_expression.left.clone().into())?;
+                        self.emit(code::OP_GRT, &[]);
+                        return Ok(());
+                    }
+
                     self.compile(infix_expression.left.clone().into())?;
                     self.compile(infix_expression.right.clone().into())?;
                     match infix_expression.operator.as_str() {
@@ -59,6 +66,9 @@ impl Compiler {
                         "-" => self.emit(code::OP_SUB, &[]),
                         "*" => self.emit(code::OP_MUL, &[]),
                         "/" => self.emit(code::OP_DIV, &[]),
+                        "==" => self.emit(code::OP_EQL, &[]),
+                        "!=" => self.emit(code::OP_NEQL, &[]),
+                        ">" => self.emit(code::OP_GRT, &[]),
                         _ => return Err(format!("unknown operator {}", infix_expression.operator)),
                     };
                 }

@@ -141,6 +141,66 @@ fn test_instructions(
 fn test_boolean_expressions() -> Result<(), String> {
     let tc = vec![
         CompilerTestCase {
+            input: "1 > 2",
+            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0]),
+                Instruction::make(code::OP_CONSTANT, &[1]),
+                Instruction::make(code::OP_GRT, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "1 < 2",
+            expected_constants: vec![Object::INTEGER(2), Object::INTEGER(1)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0]),
+                Instruction::make(code::OP_CONSTANT, &[1]),
+                Instruction::make(code::OP_GRT, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "1 == 2",
+            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0]),
+                Instruction::make(code::OP_CONSTANT, &[1]),
+                Instruction::make(code::OP_EQL, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "1 != 2",
+            expected_constants: vec![Object::INTEGER(1), Object::INTEGER(2)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0]),
+                Instruction::make(code::OP_CONSTANT, &[1]),
+                Instruction::make(code::OP_NEQL, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "true == false",
+            expected_constants: Vec::new(),
+            expected_instructions: vec![
+                Instruction::make(code::OP_TRUE, &[]),
+                Instruction::make(code::OP_FALSE, &[]),
+                Instruction::make(code::OP_EQL, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "true != false",
+            expected_constants: Vec::new(),
+            expected_instructions: vec![
+                Instruction::make(code::OP_TRUE, &[]),
+                Instruction::make(code::OP_FALSE, &[]),
+                Instruction::make(code::OP_NEQL, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
             input: "true",
             expected_constants: Vec::new(),
             expected_instructions: vec![

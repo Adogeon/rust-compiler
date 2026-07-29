@@ -3,6 +3,8 @@ use crate::compiler::{Bytecode, Compiler};
 use crate::object::Object;
 
 const STACKSIZE: usize = 2048;
+const TRUE: Object = Object::BOOLEAN(true);
+const FALSE: Object = Object::BOOLEAN(false);
 
 pub struct VM {
     constants: Vec<Object>,
@@ -44,9 +46,9 @@ impl VM {
                 }
                 code::OP_TRUE | code::OP_FALSE => {
                     if op == code::OP_TRUE {
-                        self.push(Object::BOOLEAN(true))?;
+                        self.push(TRUE)?;
                     } else {
-                        self.push(Object::BOOLEAN(false))?;
+                        self.push(FALSE)?;
                     }
                 }
                 code::OP_POP => {

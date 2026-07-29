@@ -9,6 +9,9 @@ pub const OP_ADD: Opcode = 0b100;
 pub const OP_SUB: Opcode = 0b101;
 pub const OP_MUL: Opcode = 0b110;
 pub const OP_DIV: Opcode = 0b111;
+pub const OP_EQL: Opcode = 0b1000;
+pub const OP_NEQL: Opcode = 0b1001;
+pub const OP_GRT: Opcode = 0b1010;
 
 type Definition = (&'static str, Vec<u16>);
 
@@ -20,6 +23,9 @@ fn look_up(op_code: Opcode) -> Option<Definition> {
         OP_SUB => Some(("OpSub", vec![])),
         OP_MUL => Some(("OpMul", vec![])),
         OP_DIV => Some(("OpDiv", vec![])),
+        OP_EQL => Some(("OpEqual", vec![])),
+        OP_NEQL => Some(("OpNotEqual", vec![])),
+        OP_GRT => Some(("OpGreaterThan", vec![])),
         _ => None,
     }
 }
@@ -43,6 +49,9 @@ impl Instruction {
             OP_DIV => Self(vec![op_code]),
             OP_TRUE => Self(vec![op_code]),
             OP_FALSE => Self(vec![op_code]),
+            OP_EQL => Self(vec![op_code]),
+            OP_NEQL => Self(vec![op_code]),
+            OP_GRT => Self(vec![op_code]),
             _ => Self(Vec::new()),
         }
     }
