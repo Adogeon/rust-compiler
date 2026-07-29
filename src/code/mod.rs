@@ -14,6 +14,8 @@ pub const OP_NEQL: Opcode = 0b1001;
 pub const OP_GRT: Opcode = 0b1010;
 pub const OP_MIN: Opcode = 0b1011;
 pub const OP_BANG: Opcode = 0b1100;
+pub const OP_JPNT: Opcode = 0b1101;
+pub const OP_JMP: Opcode = 0b1110;
 
 type Definition = (&'static str, Vec<u16>);
 
@@ -30,6 +32,8 @@ fn look_up(op_code: Opcode) -> Option<Definition> {
         OP_GRT => Some(("OpGreaterThan", vec![])),
         OP_MIN => Some(("OpMinus", vec![])),
         OP_BANG => Some(("OpBang", vec![])),
+        OP_JPNT => Some(("OpJumpNotTruth", vec![2])),
+        OP_JMP => Some(("OpJump", vec![2])),
         _ => None,
     }
 }

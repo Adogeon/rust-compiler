@@ -81,6 +81,26 @@ fn test_integer_arithmetic() -> Result<(), String> {
     run_compiler_test(test_cases)
 }
 
+#[test]
+fn test_conditional() -> Result<(), String> {
+    let tc = vec![
+        CompilerTestCase{
+            input: "if(true) {10}; 3333;",
+            expected_constants:vec![Object::INTEGER(10), Object::INTEGER(3333)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_TRUE, &[]),
+                Instruction::make(code::OP_JPNT, &[7]),
+                Instruction::make(code::OP_CONSTANT, &[0]),
+                Instruction::make(code::OP_POP, &[]),
+                Instruction::make(code::OP_CONSTANT, &[1]),
+                Instruction::make(code::OP_POP, &[]),
+            ] 
+        }
+    ]
+
+    Ok(())
+}
+
 fn run_compiler_test(test_cases: Vec<CompilerTestCase>) -> Result<(), String> {
     for tc in test_cases {
         let program = parse(tc.input);
