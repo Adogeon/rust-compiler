@@ -55,6 +55,14 @@ impl VM {
                         self.push(FALSE)?;
                     }
                 }
+                code::OP_BANG => {
+                    let result = self.execute_bang_operator();
+                    self.push(result)?;
+                }
+                code::OP_MIN => {
+                    let result = self.execute_minus_operator()?;
+                    self.push(result)?;
+                }
                 code::OP_POP => {
                     self.pop();
                 }
@@ -106,11 +114,6 @@ impl VM {
             let Object::INTEGER(right_value) = right else {
                 return Err(format!("Right is not an Integer Object"));
             };
-
-            println!("left: {}", left_value);
-            println!("right: {}", right_value);
-            println!("op: {}", op);
-
             return Ok(Object::INTEGER(self.execture_binary_integer_operation(
                 op,
                 left_value,
@@ -181,6 +184,23 @@ impl VM {
         } else {
             FALSE
         }
+    }
+
+    fn execute_bang_operator(&mut self) -> Object {
+        let val = self.pop();
+        match val {
+            TRUE => FALSE,
+            FALSE => TRUE,
+            _ => FALSE,
+        }
+    }
+
+    fn execute_minus_operator(&mut self) -> Result<Object, String> {
+        let obj = self.pop();
+        let Object::INTEGER(val) = obj else {
+            return Err(format!("Unsupported type for negation: {}", obj.ob_type()));
+        };
+        Ok(Object::INTEGER(-val))
     }
 }
 

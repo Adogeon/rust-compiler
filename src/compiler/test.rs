@@ -67,6 +67,15 @@ fn test_integer_arithmetic() -> Result<(), String> {
                 Instruction::make(code::OP_POP, &[]),
             ],
         },
+        CompilerTestCase {
+            input: "-1",
+            expected_constants: vec![Object::INTEGER(1)],
+            expected_instructions: vec![
+                Instruction::make(code::OP_CONSTANT, &[0]),
+                Instruction::make(code::OP_MIN, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
     ];
 
     run_compiler_test(test_cases)
@@ -213,6 +222,15 @@ fn test_boolean_expressions() -> Result<(), String> {
             expected_constants: Vec::new(),
             expected_instructions: vec![
                 Instruction::make(code::OP_FALSE, &[]),
+                Instruction::make(code::OP_POP, &[]),
+            ],
+        },
+        CompilerTestCase {
+            input: "!true",
+            expected_constants: Vec::new(),
+            expected_instructions: vec![
+                Instruction::make(code::OP_TRUE, &[]),
+                Instruction::make(code::OP_BANG, &[]),
                 Instruction::make(code::OP_POP, &[]),
             ],
         },

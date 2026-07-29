@@ -57,6 +57,22 @@ fn test_integer_arithmetic() -> Result<(), String> {
             input: "5 * (2 + 10)",
             expected: Object::INTEGER(60),
         },
+        VmTestCase {
+            input: "-5",
+            expected: Object::INTEGER(-5),
+        },
+        VmTestCase {
+            input: "-10",
+            expected: Object::INTEGER(-10),
+        },
+        VmTestCase {
+            input: "-50 + 100 + -50",
+            expected: Object::INTEGER(0),
+        },
+        VmTestCase {
+            input: "(5 + 10 * 2 + 15 / 3)*2 + -10",
+            expected: Object::INTEGER(50),
+        },
     ];
 
     run_vm_tests(test_cs)
@@ -139,6 +155,30 @@ fn test_boolean_expression() -> Result<(), String> {
         },
         VmTestCase {
             input: "(1 > 2) == false",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "!true",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "!false",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "!5",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "!!true",
+            expected: Object::BOOLEAN(true),
+        },
+        VmTestCase {
+            input: "!!false",
+            expected: Object::BOOLEAN(false),
+        },
+        VmTestCase {
+            input: "!!5",
             expected: Object::BOOLEAN(true),
         },
     ];

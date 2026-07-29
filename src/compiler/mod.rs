@@ -50,9 +50,17 @@ impl Compiler {
                     let const_pos = self.add_constant(int_lit);
                     self.emit(code::OP_CONSTANT, &[const_pos as u16]);
                 }
-                Expression::PreExp(prefix_expression) => todo!(),
+                Expression::PreExp(prefix_expression) => {
+                    self.compile(prefix_expression.right.clone().into())?;
+                    match prefix_expression.operator.as_str() {
+                        "!" => self.emit(code::OP_BANG, &[]),
+                        "-" => self.emit(code::OP_MIN, &[]),
+                        _ => return Err(format!("Prefix operation not supported")),
+                    };
+                    return Ok(());
+                }
                 Expression::InExp(infix_expression) => {
-                    if (infix_expression.operator.as_str() == "<") {
+                    if infix_expression.operator.as_str() == "<" {
                         self.compile(infix_expression.right.clone().into())?;
                         self.compile(infix_expression.left.clone().into())?;
                         self.emit(code::OP_GRT, &[]);

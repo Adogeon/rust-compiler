@@ -12,6 +12,8 @@ pub const OP_DIV: Opcode = 0b111;
 pub const OP_EQL: Opcode = 0b1000;
 pub const OP_NEQL: Opcode = 0b1001;
 pub const OP_GRT: Opcode = 0b1010;
+pub const OP_MIN: Opcode = 0b1011;
+pub const OP_BANG: Opcode = 0b1100;
 
 type Definition = (&'static str, Vec<u16>);
 
@@ -26,6 +28,8 @@ fn look_up(op_code: Opcode) -> Option<Definition> {
         OP_EQL => Some(("OpEqual", vec![])),
         OP_NEQL => Some(("OpNotEqual", vec![])),
         OP_GRT => Some(("OpGreaterThan", vec![])),
+        OP_MIN => Some(("OpMinus", vec![])),
+        OP_BANG => Some(("OpBang", vec![])),
         _ => None,
     }
 }
@@ -52,6 +56,8 @@ impl Instruction {
             OP_EQL => Self(vec![op_code]),
             OP_NEQL => Self(vec![op_code]),
             OP_GRT => Self(vec![op_code]),
+            OP_MIN => Self(vec![op_code]),
+            OP_BANG => Self(vec![op_code]),
             _ => Self(Vec::new()),
         }
     }
